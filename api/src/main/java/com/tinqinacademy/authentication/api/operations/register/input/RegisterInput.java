@@ -4,6 +4,7 @@ import com.tinqinacademy.authentication.api.base.OperationInput;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,4 +45,9 @@ public class RegisterInput implements OperationInput {
   @Email(message = "Invalid email format", regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
   @Schema(example = "ivan.petrov@example.com")
   private String email;
+
+  @NotBlank(message = "Phone number cannot be blank")
+  @Pattern(regexp = "^\\+\\d{1,3} \\d{9,11}$", message = "Invalid phoneNo format")
+  @Schema(example = "+359 863125171")
+  private String phoneNo;
 }
