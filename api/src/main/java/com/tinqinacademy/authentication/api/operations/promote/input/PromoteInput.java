@@ -1,5 +1,6 @@
 package com.tinqinacademy.authentication.api.operations.promote.input;
 
+import com.tinqinacademy.authentication.api.base.OperationInput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import org.hibernate.validator.constraints.UUID;
 @NoArgsConstructor
 @Builder
 @ToString
-public class PromoteInput {
+public class PromoteInput implements OperationInput {
 
   @UUID(message = "User id must be a valid UUID string")
   private String userId;

@@ -1,5 +1,6 @@
 package com.tinqinacademy.authentication.api.operations.changepassword.input;
 
+import com.tinqinacademy.authentication.api.base.OperationInput;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class ChangePasswordInput {
+public class ChangePasswordInput implements OperationInput {
 
   @NotBlank(message = "Old password must not be blank")
   @Schema(example = "myoldpassword69")

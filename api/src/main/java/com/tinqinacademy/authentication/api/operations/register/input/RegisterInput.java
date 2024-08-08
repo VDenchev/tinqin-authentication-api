@@ -1,5 +1,6 @@
 package com.tinqinacademy.authentication.api.operations.register.input;
 
+import com.tinqinacademy.authentication.api.base.OperationInput;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class RegisterInput {
+public class RegisterInput implements OperationInput {
 
   @NotBlank(message = "Username must not be blank")
   @Size(min = 2, message = "Username must be at least 2 characters in length")
