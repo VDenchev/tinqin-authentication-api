@@ -28,6 +28,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <dotenv.version>4.0.0</dotenv.version>
         <admin.version>3.0.0</admin.version>
+        <vavr.version>0.10.4</vavr.version>
     </properties>
     <dependencies>
         <dependency>
@@ -80,6 +81,11 @@
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
             <version>${dotenv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
+            <version>${vavr.version}</version>
         </dependency>
     </dependencies>
 
