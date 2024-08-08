@@ -9,9 +9,11 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import jakarta.validation.Validator;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.stereotype.Service;
 
 import static io.vavr.API.Match;
 
+@Service
 public class PromoteOperationProcessor extends BaseOperationProcessor implements PromoteOperation {
 
   public PromoteOperationProcessor(ConversionService conversionService, Validator validator) {
