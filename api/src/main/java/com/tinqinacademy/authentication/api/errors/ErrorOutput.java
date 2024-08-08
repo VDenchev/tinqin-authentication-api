@@ -1,4 +1,4 @@
-package com.tinqinacademy.authentication.api.operations.register.output;
+package com.tinqinacademy.authentication.api.errors;
 
 import com.tinqinacademy.authentication.api.base.OperationOutput;
 import lombok.AllArgsConstructor;
@@ -7,14 +7,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.http.HttpStatusCode;
+
+import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @ToString
-public class RegisterOutput implements OperationOutput {
+public class ErrorOutput implements OperationOutput {
 
-  private String id;
+  private List<? extends Error> errors;
+  private HttpStatusCode statusCode;
 }

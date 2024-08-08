@@ -1,5 +1,6 @@
 package com.tinqinacademy.authentication.api.operations.confirmregistration.output;
 
+import com.tinqinacademy.authentication.api.base.OperationOutput;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,5 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class ConfirmRegistrationOutput {
+public class ConfirmRegistrationOutput implements OperationOutput {
 }

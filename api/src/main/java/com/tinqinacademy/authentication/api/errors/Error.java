@@ -1,6 +1,5 @@
-package com.tinqinacademy.authentication.api.operations.register.output;
+package com.tinqinacademy.authentication.api.errors;
 
-import com.tinqinacademy.authentication.api.base.OperationOutput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +13,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class RegisterOutput implements OperationOutput {
+public class Error {
 
-  private String id;
+  private String message;
+  private String field;
 }
