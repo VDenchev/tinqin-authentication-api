@@ -29,6 +29,7 @@
         <dotenv.version>4.0.0</dotenv.version>
         <admin.version>3.0.0</admin.version>
         <vavr.version>0.10.4</vavr.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
     </properties>
     <dependencies>
         <dependency>
@@ -86,6 +87,11 @@
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
             <version>${vavr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
     </dependencies>
 
