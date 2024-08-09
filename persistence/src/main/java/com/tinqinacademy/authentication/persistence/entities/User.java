@@ -40,6 +40,8 @@ public class User extends BaseEntity {
   private String email;
   @Column(name = "password", nullable = false)
   private String password;
+  @Column(name="is_verified", nullable = false)
+  private Boolean isVerified;
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(

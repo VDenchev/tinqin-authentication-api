@@ -7,6 +7,7 @@ import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
 import com.tinqinacademy.authentication.api.operations.register.input.RegisterInput;
 import com.tinqinacademy.authentication.api.operations.register.operation.RegisterOperation;
 import com.tinqinacademy.authentication.api.operations.register.output.RegisterOutput;
+import com.tinqinacademy.authentication.core.services.EmailConfirmationService;
 import com.tinqinacademy.authentication.persistence.entities.Role;
 import com.tinqinacademy.authentication.persistence.entities.User;
 import com.tinqinacademy.authentication.persistence.enums.RoleEnum;
@@ -15,8 +16,7 @@ import com.tinqinacademy.authentication.persistence.repositories.UserRepository;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import jakarta.validation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,18 +28,24 @@ import java.util.ArrayList;
 import static io.vavr.API.Match;
 
 @Service
+@Slf4j
 public class RegisterOperationProcessor extends BaseOperationProcessor implements RegisterOperation {
 
-  private static final Logger log = LoggerFactory.getLogger(RegisterOperationProcessor.class);
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
+  private final EmailConfirmationService emailConfirmationService;
 
-  public RegisterOperationProcessor(ConversionService conversionService, Validator validator, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+  public RegisterOperationProcessor(
+      ConversionService conversionService, Validator validator, UserRepository userRepository,
+      RoleRepository roleRepository, PasswordEncoder passwordEncoder,
+      EmailConfirmationService emailConfirmationService
+  ) {
     super(conversionService, validator);
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.passwordEncoder = passwordEncoder;
+    this.emailConfirmationService = emailConfirmationService;
   }
 
   @Transactional
@@ -61,6 +67,8 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
                   User savedUser = userRepository.save(userToSave);
 
+                  emailConfirmationService.sendConfirmationEmail(savedUser);
+
                   RegisterOutput output = createOutput(savedUser);
                   log.info("End register output: {}", output);
                   return output;
@@ -71,12 +79,6 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
                     defaultCase(t)
                 ))
         );
-  }
-
-  private static RegisterOutput createOutput(User savedUser) {
-    return RegisterOutput.builder()
-        .id(savedUser.getId().toString())
-        .build();
   }
 
   private void checkDuplicateUsername(RegisterInput input) {
@@ -114,6 +116,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
             RoleEnum.USER)));
     user.setRoles(new ArrayList<>());
     user.getRoles().add(userRole);
+    user.setIsVerified(Boolean.FALSE);
 
     promoteIfNoAdmins(user);
     return user;
@@ -127,5 +130,11 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
               RoleEnum.ADMIN)));
       user.getRoles().add(adminRole);
     }
+  }
+
+  private RegisterOutput createOutput(User savedUser) {
+    return RegisterOutput.builder()
+        .id(savedUser.getId().toString())
+        .build();
   }
 }
