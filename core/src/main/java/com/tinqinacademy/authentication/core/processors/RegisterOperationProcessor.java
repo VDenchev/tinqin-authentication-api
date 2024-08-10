@@ -2,7 +2,7 @@ package com.tinqinacademy.authentication.core.processors;
 
 import com.tinqinacademy.authentication.api.base.BaseOperationProcessor;
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
-import com.tinqinacademy.authentication.api.exceptions.EntityAlreadyExists;
+import com.tinqinacademy.authentication.api.exceptions.EntityAlreadyExistsException;
 import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
 import com.tinqinacademy.authentication.api.operations.register.input.RegisterInput;
 import com.tinqinacademy.authentication.api.operations.register.operation.RegisterOperation;
@@ -75,7 +75,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
                 })
                 .toEither()
                 .mapLeft(t -> Match(t).of(
-                    customStatusCase(t, EntityAlreadyExists.class, HttpStatus.CONFLICT),
+                    customStatusCase(t, EntityAlreadyExistsException.class, HttpStatus.CONFLICT),
                     defaultCase(t)
                 ))
         );
@@ -86,7 +86,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
     boolean idDuplicateUsername = userRepository.existsByUsernameIgnoreCase(username);
     if (idDuplicateUsername) {
-      throw new EntityAlreadyExists(String.format("User with the username \"%s\" already exists", username));
+      throw new EntityAlreadyExistsException(String.format("User with the username \"%s\" already exists", username));
     }
   }
 
@@ -95,7 +95,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
     boolean idDuplicateEmail = userRepository.existsByEmailIgnoreCase(email);
     if (idDuplicateEmail) {
-      throw new EntityAlreadyExists(String.format("User with email \"%s\" already exists", email));
+      throw new EntityAlreadyExistsException(String.format("User with email \"%s\" already exists", email));
     }
   }
 
@@ -104,7 +104,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
     boolean idDuplicatePhoneNo = userRepository.existsByPhoneNumber(phoneNo);
     if (idDuplicatePhoneNo) {
-      throw new EntityAlreadyExists(String.format("User with phoneNo \"%s\" already exists", phoneNo));
+      throw new EntityAlreadyExistsException(String.format("User with phoneNo \"%s\" already exists", phoneNo));
     }
   }
 
