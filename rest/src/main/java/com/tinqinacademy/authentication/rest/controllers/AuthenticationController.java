@@ -61,7 +61,7 @@ public class AuthenticationController extends BaseController {
   private final DemoteOperation demoteOperation;
 
   @Operation(
-      summary = "Logins a user",
+      summary = "Logs in a user",
       description = "Logins a user and issues a JWT with a 5 minute validity"
   )
   @ApiResponses(value = {
@@ -144,6 +144,7 @@ public class AuthenticationController extends BaseController {
   @ApiResponses(value = {
       @ApiResponse(description = "Successfully changed the password", responseCode = "200"),
       @ApiResponse(description = "Validation error", responseCode = "422"),
+      @ApiResponse(description = "Invalid credentials", responseCode = "400"),
       @ApiResponse(description = "Not authenticated", responseCode = "401")
   })
   @PostMapping(CHANGE_PASSWORD)
