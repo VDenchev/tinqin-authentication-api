@@ -24,15 +24,10 @@ public abstract class BaseController {
     return either
         .fold(
             error -> new ResponseEntity<>(error, error.getStatusCode()),
-            output -> {
-              ResponseEntity<OperationOutput> res = ResponseEntity
-                  .status(statusCode)
-                  .body(output);
-
-              res.getHeaders()
-                  .add("Authorization", "Bearer " + output.getToken());
-              return res;
-            }
+            output -> ResponseEntity
+                .status(statusCode)
+                .header("Authorization", "Bearer " + output.getToken())
+                .body(output)
         );
   }
 }

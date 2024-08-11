@@ -25,6 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMAIL_TAKEN_FORMAT;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.PHONE_NO_TAKEN_FORMAT;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.UNKNOWN_ROLE_FORMAT;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.USERNAME_TAKEN_FORMAT;
 import static io.vavr.API.Match;
 
 @Service
@@ -86,7 +90,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
     boolean idDuplicateUsername = userRepository.existsByUsernameIgnoreCase(username);
     if (idDuplicateUsername) {
-      throw new EntityAlreadyExistsException(String.format("User with the username \"%s\" already exists", username));
+      throw new EntityAlreadyExistsException(String.format(USERNAME_TAKEN_FORMAT, username));
     }
   }
 
@@ -95,7 +99,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
     boolean idDuplicateEmail = userRepository.existsByEmailIgnoreCase(email);
     if (idDuplicateEmail) {
-      throw new EntityAlreadyExistsException(String.format("User with email \"%s\" already exists", email));
+      throw new EntityAlreadyExistsException(String.format(EMAIL_TAKEN_FORMAT, email));
     }
   }
 
@@ -104,7 +108,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
 
     boolean idDuplicatePhoneNo = userRepository.existsByPhoneNumber(phoneNo);
     if (idDuplicatePhoneNo) {
-      throw new EntityAlreadyExistsException(String.format("User with phoneNo \"%s\" already exists", phoneNo));
+      throw new EntityAlreadyExistsException(String.format(PHONE_NO_TAKEN_FORMAT, phoneNo));
     }
   }
 
@@ -112,8 +116,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     User user = conversionService.convert(input, User.class);
     user.setPassword(securePasswordHash);
     Role userRole = roleRepository.findByType(RoleEnum.USER)
-        .orElseThrow(() -> new UnknownRoleException(String.format("Role %s does not exist",
-            RoleEnum.USER)));
+        .orElseThrow(() -> new UnknownRoleException(String.format(UNKNOWN_ROLE_FORMAT, RoleEnum.USER)));
     user.setRoles(new ArrayList<>());
     user.getRoles().add(userRole);
     user.setIsVerified(Boolean.FALSE);
@@ -126,8 +129,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     Long adminsCount = userRepository.countUsersWithAdminRole();
     if (adminsCount == 0) {
       Role adminRole = roleRepository.findByType(RoleEnum.ADMIN)
-          .orElseThrow(() -> new UnknownRoleException(String.format("Role %s does not exist",
-              RoleEnum.ADMIN)));
+          .orElseThrow(() -> new UnknownRoleException(String.format(UNKNOWN_ROLE_FORMAT, RoleEnum.ADMIN)));
       user.getRoles().add(adminRole);
     }
   }
