@@ -11,6 +11,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
   Optional<User> findByUsernameIgnoreCase(String username);
+  Optional<User> findByEmailIgnoreCase(String email);
 
   @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.type = 'ADMIN'")
   Long countUsersWithAdminRole();

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMAIL_NOT_CONFIRMED;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMAIL_NOT_CONFIRMED_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.INVALID_CREDENTIALS_MESSAGE;
 import static io.vavr.API.Match;
 
@@ -56,7 +56,7 @@ public class LoginOperationProcessor extends BaseOperationProcessor implements L
                       .orElseThrow(() -> new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE));
 
                   if (!user.getIsVerified()) {
-                    throw new UserNotVerifiedException(EMAIL_NOT_CONFIRMED);
+                    throw new UserNotVerifiedException(EMAIL_NOT_CONFIRMED_MESSAGE);
                   }
 
                   checkPasswordsMatch(validInput, user);

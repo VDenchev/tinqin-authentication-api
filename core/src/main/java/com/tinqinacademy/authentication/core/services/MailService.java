@@ -9,6 +9,7 @@ import freemarker.template.TemplateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,23 +22,48 @@ import java.util.Map;
 @Slf4j
 public class MailService {
 
+  public static final String SENDER_NAME = "hotel@tinqinacademy.com";
+
   private final MailgunMessagesApi mailgunMessagesApi;
   private final Configuration freeMarkerConfig;
 
   @Value("${mailgun.domain}")
   private String DOMAIN;
 
-  public void sendConfirmationEmail(String recipient, String otp) {
+  public void sendConfirmationEmail(String recipient, String verificationCode) {
     Map<String, Object> model = new HashMap<>();
-    model.put("verificationCode", otp);
+    model.put("verificationCode", verificationCode);
 
     try {
       String emailTemplateString = getHtmlFromTemplate("email-verification-template.ftl", model);
 
       Message message = Message.builder()
-          .from("tinqin.hotel@tinqin.com")
+          .from(SENDER_NAME)
           .to(recipient)
           .subject("Verify account")
+          .html(emailTemplateString)
+          .build();
+
+
+      MessageResponse messageResponse = mailgunMessagesApi.sendMessage(DOMAIN, message);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Async
+  public void sendPasswordRecoveryEmail(String recipient, String recoveryCode) {
+
+    Map<String, Object> model = new HashMap<>();
+    model.put("recoveryCode", recoveryCode);
+
+    try {
+      String emailTemplateString = getHtmlFromTemplate("password-recovery-template.ftl", model);
+
+      Message message = Message.builder()
+          .from(SENDER_NAME)
+          .to(recipient)
+          .subject("Recover password")
           .html(emailTemplateString)
           .build();
 

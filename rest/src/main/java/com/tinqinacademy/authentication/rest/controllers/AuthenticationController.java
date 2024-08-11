@@ -5,6 +5,9 @@ import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.operations.changepassword.input.ChangePasswordInput;
 import com.tinqinacademy.authentication.api.operations.changepassword.operation.ChangePasswordOperation;
 import com.tinqinacademy.authentication.api.operations.changepassword.output.ChangePasswordOutput;
+import com.tinqinacademy.authentication.api.operations.changepasswordusingrecoverycode.input.ChangePasswordUsingRecoveryCodeInput;
+import com.tinqinacademy.authentication.api.operations.changepasswordusingrecoverycode.operation.ChangePasswordUsingRecoveryCodeOperation;
+import com.tinqinacademy.authentication.api.operations.changepasswordusingrecoverycode.output.ChangePasswordUsingRecoveryCodeOutput;
 import com.tinqinacademy.authentication.api.operations.confirmregistration.input.ConfirmRegistrationInput;
 import com.tinqinacademy.authentication.api.operations.confirmregistration.operation.ConfirmRegistrationOperation;
 import com.tinqinacademy.authentication.api.operations.confirmregistration.output.ConfirmRegistrationOutput;
@@ -36,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANGE_PASSWORD;
+import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANGE_PASSWORD_USING_RECOVERY;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CONFIRM_REGISTRATION;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.DEMOTE;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.LOGIN;
@@ -51,6 +55,7 @@ public class AuthenticationController extends BaseController {
   private final RegisterOperation registerOperation;
   private final RecoverPasswordOperation recoverPasswordOperation;
   private final ConfirmRegistrationOperation confirmRegistrationOperation;
+  private final ChangePasswordUsingRecoveryCodeOperation changePasswordUsingRecoveryCodeOperation;
   private final ChangePasswordOperation changePasswordOperation;
   private final PromoteOperation promoteOperation;
   private final DemoteOperation demoteOperation;
@@ -96,6 +101,23 @@ public class AuthenticationController extends BaseController {
   @PostMapping(RECOVER_PASSWORD)
   public ResponseEntity<OperationOutput> recoverPassword(@RequestBody RecoverPasswordInput input) {
     Either<? extends ErrorOutput, RecoverPasswordOutput> output = recoverPasswordOperation.process(input);
+    return createResponse(output, HttpStatus.OK);
+  }
+
+  @Operation(
+      summary = "Chane password via a recovery code",
+      description = "Changes the user password using a recovery code"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(description = "Changed password", responseCode = "200"),
+      @ApiResponse(description = "Invalid recovery code", responseCode = "400"),
+  })
+  @PostMapping(CHANGE_PASSWORD_USING_RECOVERY)
+  public ResponseEntity<OperationOutput> changePasswordUsingRecoveryCode(
+      @RequestBody ChangePasswordUsingRecoveryCodeInput input
+  ) {
+    Either<? extends ErrorOutput, ChangePasswordUsingRecoveryCodeOutput>
+        output = changePasswordUsingRecoveryCodeOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
 

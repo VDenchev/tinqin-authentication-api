@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static io.vavr.API.Match;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.INVALID_VERIFICATION_CODE_MESSAGE;
 
 @Service
 @Slf4j
@@ -49,7 +50,7 @@ public class ConfirmRegistrationOperationProcessor extends BaseOperationProcesso
                   log.info("Start confirm registration input: {}", validInput);
 
                   VerificationCode verificationCode = verificationCodeRepository.findFirstByCodeOrderByCreatedAtDesc(validInput.getConfirmationCode())
-                      .orElseThrow(() -> new InvalidCodeException(validInput.getConfirmationCode()));
+                      .orElseThrow(() -> new InvalidCodeException(INVALID_VERIFICATION_CODE_MESSAGE));
 
                   UUID userId = verificationCode.getUserId();
                   verificationCodeRepository.delete(verificationCode);
