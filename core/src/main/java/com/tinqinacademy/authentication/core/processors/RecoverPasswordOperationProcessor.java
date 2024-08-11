@@ -65,7 +65,7 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
                   }
 
                   User user = userMaybe.get();
-                  recoveryCodeRepository.deleteAllAllByUserId(user.getId());
+                  recoveryCodeRepository.deleteAllByUserId(user.getId());
 
                   String otp = generateRandomOtp(OTP_LENGTH);
                   String hashedOtp = passwordEncoder.encode(otp);

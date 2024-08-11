@@ -11,6 +11,6 @@ import java.util.UUID;
 @Repository
 public interface RecoveryCodeRepository extends MongoRepository<RecoveryCode, ObjectId> {
 
-  void deleteAllAllByUserId(UUID userId);
+  void deleteAllByUserId(UUID userId);
   Optional<RecoveryCode> findFirstByUserIdOrderByCreatedAtDesc(UUID userId);
 }
