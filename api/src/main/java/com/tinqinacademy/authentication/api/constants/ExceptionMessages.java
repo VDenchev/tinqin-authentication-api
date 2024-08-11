@@ -10,4 +10,5 @@ public class ExceptionMessages {
   public static final String UNKNOWN_ROLE_FORMAT = "Role %s does not exist";
   public static final String INVALID_CREDENTIALS_MESSAGE = "Invalid credentials";
   public static final String EMAIL_NOT_CONFIRMED = "Email is not confirmed";
+  public static final String RECOVERY_NOT_REQUESTED_MESSAGE = "No recovery request has been made for this email";
 }
