@@ -12,4 +12,5 @@ public class ExceptionMessages {
   public static final String INVALID_CREDENTIALS_MESSAGE = "Invalid credentials";
   public static final String EMAIL_NOT_CONFIRMED_MESSAGE = "Email is not confirmed";
   public static final String RECOVERY_NOT_REQUESTED_MESSAGE = "No recovery request has been made for this email";
+  public static final String SELF_PROMOTE_MESSAGE = "Cannot promote yourself";
 }
