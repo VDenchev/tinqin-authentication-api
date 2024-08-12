@@ -159,7 +159,8 @@ public class AuthenticationController extends BaseController {
       description = "An admin can promote another user to an admin"
   )
   @ApiResponses(value = {
-      @ApiResponse(description = "Successfully promoted user", responseCode = "200"),
+      @ApiResponse(description = "Successfully promoted user or user was already promoted", responseCode = "200"),
+      @ApiResponse(description = "Cannot promote yourself", responseCode = "400"),
       @ApiResponse(description = "Validation error", responseCode = "422"),
       @ApiResponse(description = "Not authenticated", responseCode = "401"),
       @ApiResponse(description = "Not authorized", responseCode = "403")
