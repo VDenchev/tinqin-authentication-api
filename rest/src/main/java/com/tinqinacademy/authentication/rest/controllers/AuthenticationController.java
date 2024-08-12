@@ -160,7 +160,8 @@ public class AuthenticationController extends BaseController {
   )
   @ApiResponses(value = {
       @ApiResponse(description = "Successfully promoted user or user was already promoted", responseCode = "200"),
-      @ApiResponse(description = "Cannot promote yourself", responseCode = "400"),
+      @ApiResponse(description = "Cannot promote yourself", responseCode = "409"),
+      @ApiResponse(description = "User with id doesnt exist", responseCode = "400"),
       @ApiResponse(description = "Validation error", responseCode = "422"),
       @ApiResponse(description = "Not authenticated", responseCode = "401"),
       @ApiResponse(description = "Not authorized", responseCode = "403")
@@ -179,6 +180,8 @@ public class AuthenticationController extends BaseController {
   @ApiResponses(value = {
       @ApiResponse(description = "Successfully demoted user", responseCode = "200"),
       @ApiResponse(description = "Validation error", responseCode = "422"),
+      @ApiResponse(description = "Cannot demote yourself or the last remaining admin", responseCode = "409"),
+      @ApiResponse(description = "User with id doesnt exist", responseCode = "400"),
       @ApiResponse(description = "Not authenticated", responseCode = "401"),
       @ApiResponse(description = "Not authorized", responseCode = "403")
   })
