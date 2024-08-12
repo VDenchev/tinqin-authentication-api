@@ -59,7 +59,6 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
                   log.info("Start recover password input: {}", validInput);
                   Optional<User> userMaybe = userRepository.findByEmailIgnoreCase(validInput.getEmail());
 
-                  // Remove guard clause???
                   if (userMaybe.isEmpty()) {
                     return createOutput();
                   }
