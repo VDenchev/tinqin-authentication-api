@@ -13,4 +13,6 @@ public class ExceptionMessages {
   public static final String EMAIL_NOT_CONFIRMED_MESSAGE = "Email is not confirmed";
   public static final String RECOVERY_NOT_REQUESTED_MESSAGE = "No recovery request has been made for this email";
   public static final String SELF_PROMOTE_MESSAGE = "Cannot promote yourself";
+  public static final String SELF_DEMOTE_MESSAGE = "Cannot demote yourself";
+  public static final String LAST_ADMIN_DEMOTE_MESSAGE = "Cannot demote last admin user";
 }
