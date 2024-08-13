@@ -3,6 +3,7 @@ package com.tinqinacademy.authentication.core.processors;
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.exceptions.EntityNotFoundException;
 import com.tinqinacademy.authentication.api.exceptions.LastAdminDemotionException;
+import com.tinqinacademy.authentication.api.exceptions.NoPermissionsException;
 import com.tinqinacademy.authentication.api.exceptions.SelfModificationNotAllowedException;
 import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
 import com.tinqinacademy.authentication.api.models.TokenWrapper;
@@ -55,6 +56,8 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
             Try.of(() -> {
                   log.info("Start demote input: {}", validInput);
 
+                  checkPrincipalPermissions();
+
                   UUID userId = UUID.fromString(input.getUserId());
                   User user = userRepository.findById(userId)
                       .orElseThrow(() -> new EntityNotFoundException("User", userId));
@@ -78,6 +81,14 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
                     defaultCase(t)
                 ))
         );
+  }
+
+  private void checkPrincipalPermissions() {
+    boolean hasAdminRole = tokenWrapper.getRoles().stream()
+        .anyMatch(r -> r.equals(com.tinqinacademy.authentication.api.enums.RoleEnum.ADMIN));
+    if (!hasAdminRole) {
+      throw new NoPermissionsException();
+    }
   }
 
   private void checkForLastAdminLeft(User user) {

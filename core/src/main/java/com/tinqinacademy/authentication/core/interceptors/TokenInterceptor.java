@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
-import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMPTY_JWT_EXCEPTION;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMPTY_JWT_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.JWT_EXPIRED_MESSAGE;
 
 @Component
@@ -40,7 +40,7 @@ public class TokenInterceptor implements HandlerInterceptor {
     final String authHeaderValue = request.getHeader(AUTH_HEADER);
 
     if (authHeaderValue == null || !authHeaderValue.startsWith(BEARER_PREFIX)) {
-      buildErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, EMPTY_JWT_EXCEPTION);
+      buildErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, EMPTY_JWT_MESSAGE);
       return false;
     }
 
