@@ -26,6 +26,9 @@ import com.tinqinacademy.authentication.api.operations.recoverpassword.output.Re
 import com.tinqinacademy.authentication.api.operations.register.input.RegisterInput;
 import com.tinqinacademy.authentication.api.operations.register.operation.RegisterOperation;
 import com.tinqinacademy.authentication.api.operations.register.output.RegisterOutput;
+import com.tinqinacademy.authentication.api.operations.validatetoken.input.ValidateTokenInput;
+import com.tinqinacademy.authentication.api.operations.validatetoken.operation.ValidateTokenOperation;
+import com.tinqinacademy.authentication.api.operations.validatetoken.output.ValidateTokenOutput;
 import com.tinqinacademy.authentication.rest.base.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANGE_PASSWORD;
@@ -46,6 +50,7 @@ import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.LOGIN
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.PROMOTE;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.RECOVER_PASSWORD;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.REGISTER;
+import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.VALIDATE_TOKEN;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,6 +64,7 @@ public class AuthenticationController extends BaseController {
   private final ChangePasswordOperation changePasswordOperation;
   private final PromoteOperation promoteOperation;
   private final DemoteOperation demoteOperation;
+  private final ValidateTokenOperation validateTokenOperation;
 
   @Operation(
       summary = "Logs in a user",
@@ -73,6 +79,26 @@ public class AuthenticationController extends BaseController {
   public ResponseEntity<OperationOutput> login(@RequestBody LoginInput input) {
     Either<? extends ErrorOutput, LoginOutput> output = loginOperation.process(input);
     return createResponseWithAuthHeader(output, HttpStatus.OK);
+  }
+
+
+  @Operation(
+      summary = "Validates JWT",
+      description = "Returns user details if the token is valid"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(description = "Returns user details", responseCode = "200"),
+      @ApiResponse(description = "Invalid token", responseCode = "400")
+  })
+  @PostMapping(VALIDATE_TOKEN)
+  public ResponseEntity<OperationOutput> validateToken(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
+    String token = authHeader.replace("Bearer ", "");
+    ValidateTokenInput input = ValidateTokenInput.builder()
+        .token(token)
+        .build();
+
+    Either<? extends ErrorOutput, ValidateTokenOutput> output = validateTokenOperation.process(input);
+    return createResponse(output, HttpStatus.OK);
   }
 
 

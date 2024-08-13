@@ -13,4 +13,5 @@ public class RestApiRoutes {
   public static final String CHANGE_PASSWORD = AUTH + "/change-password";
   public static final String PROMOTE = AUTH + "/promote";
   public static final String DEMOTE = AUTH + "/demote";
+  public static final String VALIDATE_TOKEN = AUTH + "/validate-token";
 }
