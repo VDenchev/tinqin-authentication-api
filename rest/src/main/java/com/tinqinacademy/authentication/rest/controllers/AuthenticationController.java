@@ -17,6 +17,9 @@ import com.tinqinacademy.authentication.api.operations.demote.output.DemoteOutpu
 import com.tinqinacademy.authentication.api.operations.login.input.LoginInput;
 import com.tinqinacademy.authentication.api.operations.login.operation.LoginOperation;
 import com.tinqinacademy.authentication.api.operations.login.output.LoginOutput;
+import com.tinqinacademy.authentication.api.operations.logout.input.LogoutInput;
+import com.tinqinacademy.authentication.api.operations.logout.operation.LogoutOperation;
+import com.tinqinacademy.authentication.api.operations.logout.output.LogoutOutput;
 import com.tinqinacademy.authentication.api.operations.promote.input.PromoteInput;
 import com.tinqinacademy.authentication.api.operations.promote.operation.PromoteOperation;
 import com.tinqinacademy.authentication.api.operations.promote.output.PromoteOutput;
@@ -47,6 +50,7 @@ import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANG
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CONFIRM_REGISTRATION;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.DEMOTE;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.LOGIN;
+import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.LOGOUT;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.PROMOTE;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.RECOVER_PASSWORD;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.REGISTER;
@@ -65,6 +69,7 @@ public class AuthenticationController extends BaseController {
   private final PromoteOperation promoteOperation;
   private final DemoteOperation demoteOperation;
   private final ValidateTokenOperation validateTokenOperation;
+  private final LogoutOperation logoutOperation;
 
   @Operation(
       summary = "Logs in a user",
@@ -79,6 +84,21 @@ public class AuthenticationController extends BaseController {
   public ResponseEntity<OperationOutput> login(@RequestBody LoginInput input) {
     Either<? extends ErrorOutput, LoginOutput> output = loginOperation.process(input);
     return createResponseWithAuthHeader(output, HttpStatus.OK);
+  }
+
+
+  @Operation(
+      summary = "Logs out a user",
+      description = "Logs out a user and invalidates jwt"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(description = "Invalidates jwt and logs out", responseCode = "200"),
+      @ApiResponse(description = "Not authorized", responseCode = "401")
+  })
+  @PostMapping(LOGOUT)
+  public ResponseEntity<OperationOutput> logout() {
+    Either<? extends ErrorOutput, LogoutOutput> output = logoutOperation.process(LogoutInput.builder().build());
+    return createResponse(output, HttpStatus.OK);
   }
 
 
