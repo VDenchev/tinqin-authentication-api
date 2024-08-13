@@ -15,4 +15,9 @@ public class ExceptionMessages {
   public static final String SELF_PROMOTE_MESSAGE = "Cannot promote yourself";
   public static final String SELF_DEMOTE_MESSAGE = "Cannot demote yourself";
   public static final String LAST_ADMIN_DEMOTE_MESSAGE = "Cannot demote last admin user";
+  public static final String JWT_EXPIRED_MESSAGE = "JWT is expired";
+  public static final String INVALID_JWT_MESSAGE = "Invalid JWT format";
+  public static final String UNSUPPORTED_JWT_MESSAGE = "Unsupported token format";
+  public static final String PARSING_JWT_MESSAGE = "Error parsing JWT";
+  public static final String EMPTY_JWT_EXCEPTION = "JWT cannot be empty or null";
 }
