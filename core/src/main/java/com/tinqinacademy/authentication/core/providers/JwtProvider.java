@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMPTY_JWT_EXCEPTION;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMPTY_JWT_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.INVALID_JWT_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.JWT_EXPIRED_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.PARSING_JWT_MESSAGE;
@@ -57,7 +57,10 @@ public class JwtProvider implements TokenProvider {
   }
 
   public List<RoleEnum> getRolesFromToken(String token) {
-    return extractClaims(token).get("roles", ArrayList.class);
+    List<String> rolesAsString = extractClaims(token).get("roles", ArrayList.class);
+    return rolesAsString.stream()
+        .map(RoleEnum::valueOf)
+        .toList();
   }
 
   private Claims extractClaims(String token) {
@@ -76,7 +79,7 @@ public class JwtProvider implements TokenProvider {
     } catch (io.jsonwebtoken.JwtException e) {
       throw new JwtException(PARSING_JWT_MESSAGE);
     } catch (IllegalArgumentException e) {
-      throw new JwtException(EMPTY_JWT_EXCEPTION);
+      throw new JwtException(EMPTY_JWT_MESSAGE);
     }
   }
 

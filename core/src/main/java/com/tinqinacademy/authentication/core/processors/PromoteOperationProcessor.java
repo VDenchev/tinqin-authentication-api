@@ -2,6 +2,7 @@ package com.tinqinacademy.authentication.core.processors;
 
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.exceptions.EntityNotFoundException;
+import com.tinqinacademy.authentication.api.exceptions.NoPermissionsException;
 import com.tinqinacademy.authentication.api.exceptions.SelfModificationNotAllowedException;
 import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
 import com.tinqinacademy.authentication.api.models.TokenWrapper;
@@ -54,6 +55,8 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
             Try.of(() -> {
                   log.info("Start promote input: {}", validInput);
 
+                  checkPrincipalPermissions();
+
                   UUID userId = UUID.fromString(validInput.getUserId());
                   User user = userRepository.findById(userId)
                       .orElseThrow(() -> new EntityNotFoundException("User", userId));
@@ -82,7 +85,15 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
     }
   }
 
-  private static PromoteOutput createOutput() {
+  private void checkPrincipalPermissions() {
+    boolean hasAdminRole = tokenWrapper.getRoles().stream()
+        .anyMatch(r -> r.equals(com.tinqinacademy.authentication.api.enums.RoleEnum.ADMIN));
+    if (!hasAdminRole) {
+      throw new NoPermissionsException();
+    }
+  }
+
+  private PromoteOutput createOutput() {
     return PromoteOutput.builder().build();
   }
 
@@ -92,7 +103,8 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
         .orElseThrow(() -> new UnknownRoleException(String.format(UNKNOWN_ROLE_FORMAT, role)));
 
     List<Role> userRoles = user.getRoles();
-    boolean alreadyHasAdminRole = userRoles.stream().anyMatch(r -> r.getType().equals(adminRole.getType()));
+    boolean alreadyHasAdminRole = userRoles.stream().
+        anyMatch(r -> r.getType().equals(adminRole.getType()));
 
     if (alreadyHasAdminRole) {
       return;
