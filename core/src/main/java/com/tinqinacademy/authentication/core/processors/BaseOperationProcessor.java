@@ -1,5 +1,6 @@
-package com.tinqinacademy.authentication.api.base;
+package com.tinqinacademy.authentication.core.processors;
 
+import com.tinqinacademy.authentication.api.base.OperationInput;
 import com.tinqinacademy.authentication.api.errors.Error;
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import io.vavr.API;

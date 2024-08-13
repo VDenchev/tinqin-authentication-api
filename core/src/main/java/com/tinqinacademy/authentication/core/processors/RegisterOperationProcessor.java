@@ -1,6 +1,5 @@
 package com.tinqinacademy.authentication.core.processors;
 
-import com.tinqinacademy.authentication.api.base.BaseOperationProcessor;
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.exceptions.EntityAlreadyExistsException;
 import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
