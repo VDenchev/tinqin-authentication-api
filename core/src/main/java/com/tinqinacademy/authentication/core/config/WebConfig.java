@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANGE_PASSWORD;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.DEMOTE;
+import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.LOGOUT;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.PROMOTE;
 
 @Configuration
@@ -21,20 +22,16 @@ import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.PROMO
 public class WebConfig implements WebMvcConfigurer {
 
   private final JwtProvider jwtProvider;
+  private final TokenInterceptor tokenInterceptor;
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(tokenInterceptor())
+    registry.addInterceptor(tokenInterceptor)
         .addPathPatterns(securedEndpoints());
   }
 
   private String[] securedEndpoints() {
-    return new String[]{DEMOTE, PROMOTE, CHANGE_PASSWORD};
-  }
-
-  @Bean
-  public TokenInterceptor tokenInterceptor() {
-    return new TokenInterceptor(tokenWrapper(), jwtProvider);
+    return new String[]{DEMOTE, PROMOTE, CHANGE_PASSWORD, LOGOUT};
   }
 
   @Bean

@@ -12,10 +12,10 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,20 +36,24 @@ public class JwtProvider implements TokenProvider {
   private Long durationTime;
 
   public String createToken(String username, List<RoleEnum> roles) {
-    Date currentTime = new Date();
-    Date expireTime = new Date(currentTime.getTime() + this.durationTime);
+    Instant issuedAt = Instant.now();
+    Instant expiration = issuedAt.plusMillis(durationTime);
 
     return Jwts.builder()
         .claim("username", username)
         .claim("roles", roles)
-        .issuedAt(currentTime)
-        .expiration(expireTime)
+        .issuedAt(Date.from(issuedAt))
+        .expiration(Date.from(expiration))
         .signWith(getKey())
         .compact();
   }
 
   public String getUsernameFromToken(String token) {
     return extractClaims(token).get("username", String.class);
+  }
+
+  public Instant getExpirationTimeFromToken(String token) {
+    return extractClaims(token).get("exp", Date.class).toInstant();
   }
 
   public List<RoleEnum> getRolesFromToken(String token) {
