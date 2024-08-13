@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -21,4 +22,5 @@ public class TokenWrapper {
   private String token;
   private String username;
   private List<RoleEnum> roles;
+  private Instant expirationTime;
 }
