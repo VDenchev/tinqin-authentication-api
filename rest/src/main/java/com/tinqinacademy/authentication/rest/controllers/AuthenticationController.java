@@ -36,6 +36,7 @@ import com.tinqinacademy.authentication.rest.base.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.vavr.control.Either;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -95,6 +96,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Invalidates jwt and logs out", responseCode = "200"),
       @ApiResponse(description = "Not authorized", responseCode = "401")
   })
+  @SecurityRequirement(name = "bearerAuth")
   @PostMapping(LOGOUT)
   public ResponseEntity<OperationOutput> logout() {
     Either<? extends ErrorOutput, LogoutOutput> output = logoutOperation.process(LogoutInput.builder().build());
@@ -110,6 +112,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Returns user details", responseCode = "200"),
       @ApiResponse(description = "Invalid token", responseCode = "400")
   })
+  @SecurityRequirement(name = "bearerAuth")
   @PostMapping(VALIDATE_TOKEN)
   public ResponseEntity<OperationOutput> validateToken(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
     String token = authHeader.replace("Bearer ", "");
@@ -193,6 +196,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Invalid credentials", responseCode = "400"),
       @ApiResponse(description = "Not authenticated", responseCode = "401")
   })
+  @SecurityRequirement(name = "bearerAuth")
   @PostMapping(CHANGE_PASSWORD)
   public ResponseEntity<OperationOutput> changePassword(@RequestBody ChangePasswordInput input) {
     Either<? extends ErrorOutput, ChangePasswordOutput> output = changePasswordOperation.process(input);
@@ -212,6 +216,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Not authenticated", responseCode = "401"),
       @ApiResponse(description = "Not authorized", responseCode = "403")
   })
+  @SecurityRequirement(name = "bearerAuth")
   @PostMapping(PROMOTE)
   public ResponseEntity<OperationOutput> promote(@RequestBody PromoteInput input) {
     Either<? extends ErrorOutput, PromoteOutput> output = promoteOperation.process(input);
@@ -231,6 +236,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Not authenticated", responseCode = "401"),
       @ApiResponse(description = "Not authorized", responseCode = "403")
   })
+  @SecurityRequirement(name = "bearerAuth")
   @PostMapping(DEMOTE)
   public ResponseEntity<OperationOutput> demote(@RequestBody DemoteInput input) {
     Either<? extends ErrorOutput, DemoteOutput> output = demoteOperation.process(input);

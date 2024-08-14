@@ -1,5 +1,8 @@
 package com.tinqinacademy.authentication.rest.config;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +24,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@SecurityScheme(
+    name = "bearerAuth",
+    scheme = "bearer",
+    bearerFormat = "JWT",
+    type = SecuritySchemeType.HTTP,
+    in = SecuritySchemeIn.HEADER
+)
 public class SecurityConfig {
 
   private static final int SALT_LENGTH = 16;
