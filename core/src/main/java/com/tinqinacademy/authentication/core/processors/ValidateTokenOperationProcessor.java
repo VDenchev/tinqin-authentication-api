@@ -6,6 +6,7 @@ import com.tinqinacademy.authentication.api.operations.validatetoken.input.Valid
 import com.tinqinacademy.authentication.api.operations.validatetoken.operation.ValidateTokenOperation;
 import com.tinqinacademy.authentication.api.operations.validatetoken.output.ValidateTokenOutput;
 import com.tinqinacademy.authentication.core.providers.JwtProvider;
+import com.tinqinacademy.authentication.persistence.mongorepositories.InvalidatedJwtRepository;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import jakarta.validation.Validator;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.JWT_EXPIRED_MESSAGE;
 import static io.vavr.API.Match;
 
 @Service
@@ -25,14 +27,17 @@ public class ValidateTokenOperationProcessor extends BaseOperationProcessor impl
 
   private final JwtProvider jwtProvider;
   private final UserDetailsService userDetailsService;
+  private final InvalidatedJwtRepository invalidatedJwtRepository;
 
   public ValidateTokenOperationProcessor(
       ConversionService conversionService, Validator validator,
-      JwtProvider jwtProvider, UserDetailsService userDetailsService
+      JwtProvider jwtProvider, UserDetailsService userDetailsService,
+      InvalidatedJwtRepository invalidatedJwtRepository
   ) {
     super(conversionService, validator);
     this.jwtProvider = jwtProvider;
     this.userDetailsService = userDetailsService;
+    this.invalidatedJwtRepository = invalidatedJwtRepository;
   }
 
   @Override
@@ -42,7 +47,9 @@ public class ValidateTokenOperationProcessor extends BaseOperationProcessor impl
             Try.of(() -> {
                   log.info("Start validate token input: {}", validInput);
 
-                  String username = jwtProvider.getUsernameFromToken(input.getToken());
+                  checkForInvalidToken(validInput.getToken());
+
+                  String username = jwtProvider.getUsernameFromToken(validInput.getToken());
 
                   User userDetails = (User) userDetailsService.loadUserByUsername(username);
 
@@ -57,6 +64,13 @@ public class ValidateTokenOperationProcessor extends BaseOperationProcessor impl
                     defaultCase(t)
                 ))
         );
+  }
+
+  private void checkForInvalidToken(String token) {
+    boolean isTokenInvalidated = invalidatedJwtRepository.existsByToken(token);
+    if (isTokenInvalidated) {
+      throw new JwtException(JWT_EXPIRED_MESSAGE);
+    }
   }
 
   private ValidateTokenOutput createOutput(User userDetails) {
