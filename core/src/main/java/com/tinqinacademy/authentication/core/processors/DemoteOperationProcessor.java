@@ -6,7 +6,7 @@ import com.tinqinacademy.authentication.api.exceptions.LastAdminDemotionExceptio
 import com.tinqinacademy.authentication.api.exceptions.NoPermissionsException;
 import com.tinqinacademy.authentication.api.exceptions.SelfModificationNotAllowedException;
 import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
-import com.tinqinacademy.authentication.api.models.TokenWrapper;
+import com.tinqinacademy.authentication.api.models.TokenInput;
 import com.tinqinacademy.authentication.api.operations.demote.input.DemoteInput;
 import com.tinqinacademy.authentication.api.operations.demote.operation.DemoteOperation;
 import com.tinqinacademy.authentication.api.operations.demote.output.DemoteOutput;
@@ -36,17 +36,14 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
-  private final TokenWrapper tokenWrapper;
 
   public DemoteOperationProcessor(
       ConversionService conversionService, Validator validator,
-      UserRepository userRepository, RoleRepository roleRepository,
-      TokenWrapper tokenWrapper
+      UserRepository userRepository, RoleRepository roleRepository
   ) {
     super(conversionService, validator);
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
-    this.tokenWrapper = tokenWrapper;
   }
 
   @Override
@@ -56,13 +53,13 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
             Try.of(() -> {
                   log.info("Start demote input: {}", validInput);
 
-                  checkPrincipalPermissions();
+                  checkPrincipalPermissions(validInput.getTokenInput());
 
                   UUID userId = UUID.fromString(input.getUserId());
                   User user = userRepository.findById(userId)
                       .orElseThrow(() -> new EntityNotFoundException("User", userId));
 
-                  checkForSelfDemotion(user);
+                  checkForSelfDemotion(user, validInput.getTokenInput());
 
                   checkForLastAdminLeft(user);
 
@@ -78,13 +75,14 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
                     customStatusCase(t, LastAdminDemotionException.class, HttpStatus.CONFLICT),
                     customStatusCase(t, SelfModificationNotAllowedException.class, HttpStatus.CONFLICT),
                     customStatusCase(t, IllegalArgumentException.class, HttpStatus.UNPROCESSABLE_ENTITY),
+                    customStatusCase(t, NoPermissionsException.class, HttpStatus.FORBIDDEN),
                     defaultCase(t)
                 ))
         );
   }
 
-  private void checkPrincipalPermissions() {
-    boolean hasAdminRole = tokenWrapper.getRoles().stream()
+  private void checkPrincipalPermissions(TokenInput tokenInput) {
+    boolean hasAdminRole = tokenInput.getRoles().stream()
         .anyMatch(r -> r.equals(com.tinqinacademy.authentication.api.enums.RoleEnum.ADMIN));
     if (!hasAdminRole) {
       throw new NoPermissionsException();
@@ -104,8 +102,8 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
     }
   }
 
-  private void checkForSelfDemotion(User user) {
-    if (user.getUsername().equals(tokenWrapper.getUsername())) {
+  private void checkForSelfDemotion(User user, TokenInput tokenInput) {
+    if (user.getUsername().equals(tokenInput.getUsername())) {
       throw new SelfModificationNotAllowedException(SELF_DEMOTE_MESSAGE);
     }
   }

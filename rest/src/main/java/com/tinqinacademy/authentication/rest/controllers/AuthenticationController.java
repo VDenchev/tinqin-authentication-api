@@ -1,7 +1,9 @@
 package com.tinqinacademy.authentication.rest.controllers;
 
 import com.tinqinacademy.authentication.api.base.OperationOutput;
+import com.tinqinacademy.authentication.api.enums.RoleEnum;
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
+import com.tinqinacademy.authentication.api.models.TokenInput;
 import com.tinqinacademy.authentication.api.operations.changepassword.input.ChangePasswordInput;
 import com.tinqinacademy.authentication.api.operations.changepassword.operation.ChangePasswordOperation;
 import com.tinqinacademy.authentication.api.operations.changepassword.output.ChangePasswordOutput;
@@ -33,6 +35,7 @@ import com.tinqinacademy.authentication.api.operations.validatetoken.input.Valid
 import com.tinqinacademy.authentication.api.operations.validatetoken.operation.ValidateTokenOperation;
 import com.tinqinacademy.authentication.api.operations.validatetoken.output.ValidateTokenOutput;
 import com.tinqinacademy.authentication.rest.base.BaseController;
+import com.tinqinacademy.authentication.rest.context.TokenContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -45,6 +48,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANGE_PASSWORD;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.CHANGE_PASSWORD_USING_RECOVERY;
@@ -71,6 +76,7 @@ public class AuthenticationController extends BaseController {
   private final DemoteOperation demoteOperation;
   private final ValidateTokenOperation validateTokenOperation;
   private final LogoutOperation logoutOperation;
+  private final TokenContext tokenContext;
 
   @Operation(
       summary = "Logs in a user",
@@ -99,7 +105,11 @@ public class AuthenticationController extends BaseController {
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(LOGOUT)
   public ResponseEntity<OperationOutput> logout() {
-    Either<? extends ErrorOutput, LogoutOutput> output = logoutOperation.process(LogoutInput.builder().build());
+    LogoutInput input = LogoutInput.builder()
+        .tokenInput(buildTokenInput())
+        .build();
+
+    Either<? extends ErrorOutput, LogoutOutput> output = logoutOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
 
@@ -152,6 +162,7 @@ public class AuthenticationController extends BaseController {
     Either<? extends ErrorOutput, RecoverPasswordOutput> output = recoverPasswordOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
+
 
   @Operation(
       summary = "Chane password via a recovery code",
@@ -219,6 +230,8 @@ public class AuthenticationController extends BaseController {
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(PROMOTE)
   public ResponseEntity<OperationOutput> promote(@RequestBody PromoteInput input) {
+    input.setTokenInput(buildTokenInput());
+
     Either<? extends ErrorOutput, PromoteOutput> output = promoteOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
@@ -239,7 +252,21 @@ public class AuthenticationController extends BaseController {
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(DEMOTE)
   public ResponseEntity<OperationOutput> demote(@RequestBody DemoteInput input) {
+    input.setTokenInput(buildTokenInput());
+
     Either<? extends ErrorOutput, DemoteOutput> output = demoteOperation.process(input);
     return createResponse(output, HttpStatus.OK);
+  }
+
+  private TokenInput buildTokenInput() {
+    List<RoleEnum> roles = tokenContext.getRoles().stream()
+        .map(RoleEnum::valueOf)
+        .toList();
+    return TokenInput.builder()
+        .token(tokenContext.getToken())
+        .username(tokenContext.getUsername())
+        .roles(roles)
+        .expirationTime(tokenContext.getExpirationTime())
+        .build();
   }
 }

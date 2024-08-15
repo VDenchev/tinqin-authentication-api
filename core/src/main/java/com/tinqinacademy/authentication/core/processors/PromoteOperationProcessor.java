@@ -5,7 +5,7 @@ import com.tinqinacademy.authentication.api.exceptions.EntityNotFoundException;
 import com.tinqinacademy.authentication.api.exceptions.NoPermissionsException;
 import com.tinqinacademy.authentication.api.exceptions.SelfModificationNotAllowedException;
 import com.tinqinacademy.authentication.api.exceptions.UnknownRoleException;
-import com.tinqinacademy.authentication.api.models.TokenWrapper;
+import com.tinqinacademy.authentication.api.models.TokenInput;
 import com.tinqinacademy.authentication.api.operations.promote.input.PromoteInput;
 import com.tinqinacademy.authentication.api.operations.promote.operation.PromoteOperation;
 import com.tinqinacademy.authentication.api.operations.promote.output.PromoteOutput;
@@ -35,17 +35,14 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
-  private final TokenWrapper tokenWrapper;
 
   public PromoteOperationProcessor(
       ConversionService conversionService, Validator validator,
-      UserRepository userRepository, RoleRepository roleRepository,
-      TokenWrapper tokenWrapper
+      UserRepository userRepository, RoleRepository roleRepository
   ) {
     super(conversionService, validator);
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
-    this.tokenWrapper = tokenWrapper;
   }
 
   @Override
@@ -55,13 +52,13 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
             Try.of(() -> {
                   log.info("Start promote input: {}", validInput);
 
-                  checkPrincipalPermissions();
+                  checkPrincipalPermissions(validInput.getTokenInput());
 
                   UUID userId = UUID.fromString(validInput.getUserId());
                   User user = userRepository.findById(userId)
                       .orElseThrow(() -> new EntityNotFoundException("User", userId));
 
-                  checkForSelfPromotion(user);
+                  checkForSelfPromotion(user, validInput.getTokenInput());
 
                   promoteToAdmin(user);
 
@@ -74,19 +71,20 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
                     customStatusCase(t, SelfModificationNotAllowedException.class, HttpStatus.CONFLICT),
                     customStatusCase(t, EntityNotFoundException.class, HttpStatus.BAD_REQUEST),
                     customStatusCase(t, IllegalArgumentException.class, HttpStatus.UNPROCESSABLE_ENTITY),
+                    customStatusCase(t, NoPermissionsException.class, HttpStatus.FORBIDDEN),
                     defaultCase(t)
                 ))
         );
   }
 
-  private void checkForSelfPromotion(User user) {
-    if (user.getUsername().equals(tokenWrapper.getUsername())) {
+  private void checkForSelfPromotion(User user, TokenInput tokenInput) {
+    if (user.getUsername().equals(tokenInput.getUsername())) {
       throw new SelfModificationNotAllowedException(SELF_PROMOTE_MESSAGE);
     }
   }
 
-  private void checkPrincipalPermissions() {
-    boolean hasAdminRole = tokenWrapper.getRoles().stream()
+  private void checkPrincipalPermissions(TokenInput tokenInput) {
+    boolean hasAdminRole = tokenInput.getRoles().stream()
         .anyMatch(r -> r.equals(com.tinqinacademy.authentication.api.enums.RoleEnum.ADMIN));
     if (!hasAdminRole) {
       throw new NoPermissionsException();

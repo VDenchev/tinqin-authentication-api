@@ -1,14 +1,8 @@
-package com.tinqinacademy.authentication.core.config;
+package com.tinqinacademy.authentication.rest.config;
 
-import com.tinqinacademy.authentication.api.models.TokenWrapper;
-import com.tinqinacademy.authentication.core.interceptors.TokenInterceptor;
-import com.tinqinacademy.authentication.core.providers.JwtProvider;
+import com.tinqinacademy.authentication.rest.interceptors.TokenInterceptor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,7 +15,6 @@ import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.PROMO
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-  private final JwtProvider jwtProvider;
   private final TokenInterceptor tokenInterceptor;
 
   @Override
@@ -32,11 +25,5 @@ public class WebConfig implements WebMvcConfigurer {
 
   private String[] securedEndpoints() {
     return new String[]{DEMOTE, PROMOTE, CHANGE_PASSWORD, LOGOUT};
-  }
-
-  @Bean
-  @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-  public TokenWrapper tokenWrapper() {
-    return TokenWrapper.builder().build();
   }
 }

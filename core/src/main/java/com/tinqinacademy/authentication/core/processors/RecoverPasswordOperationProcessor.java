@@ -4,7 +4,7 @@ import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.operations.recoverpassword.input.RecoverPasswordInput;
 import com.tinqinacademy.authentication.api.operations.recoverpassword.operation.RecoverPasswordOperation;
 import com.tinqinacademy.authentication.api.operations.recoverpassword.output.RecoverPasswordOutput;
-import com.tinqinacademy.authentication.core.services.MailService;
+import com.tinqinacademy.authentication.api.services.base.MailService;
 import com.tinqinacademy.authentication.persistence.entities.RecoveryCode;
 import com.tinqinacademy.authentication.persistence.entities.User;
 import com.tinqinacademy.authentication.persistence.mongorepositories.RecoveryCodeRepository;

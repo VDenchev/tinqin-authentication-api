@@ -18,6 +18,7 @@ public class ExceptionMessages {
   public static final String JWT_EXPIRED_MESSAGE = "JWT is expired";
   public static final String INVALID_JWT_MESSAGE = "Invalid JWT format";
   public static final String UNSUPPORTED_JWT_MESSAGE = "Unsupported token format";
+  public static final String INVALID_SIGNATURE_MESSAGE = "Cannot compute signature";
   public static final String PARSING_JWT_MESSAGE = "Error parsing JWT";
   public static final String EMPTY_JWT_MESSAGE = "JWT cannot be empty or null";
   public static final String NO_PERMISSIONS_MESSAGE = "Only admins can access this resource";
