@@ -1,7 +1,7 @@
 package com.tinqinacademy.authentication.core.processors;
 
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
-import com.tinqinacademy.authentication.api.models.TokenWrapper;
+import com.tinqinacademy.authentication.api.models.TokenInput;
 import com.tinqinacademy.authentication.api.operations.logout.input.LogoutInput;
 import com.tinqinacademy.authentication.api.operations.logout.operation.LogoutOperation;
 import com.tinqinacademy.authentication.api.operations.logout.output.LogoutOutput;
@@ -21,12 +21,13 @@ import static io.vavr.API.Match;
 public class LogoutOperationProcessor extends BaseOperationProcessor implements LogoutOperation {
 
   private final InvalidatedJwtRepository invalidatedJwtRepository;
-  private final TokenWrapper tokenWrapper;
 
-  public LogoutOperationProcessor(ConversionService conversionService, Validator validator, InvalidatedJwtRepository invalidatedJwtRepository, TokenWrapper tokenWrapper) {
+  public LogoutOperationProcessor(
+      ConversionService conversionService, Validator validator,
+      InvalidatedJwtRepository invalidatedJwtRepository
+  ) {
     super(conversionService, validator);
     this.invalidatedJwtRepository = invalidatedJwtRepository;
-    this.tokenWrapper = tokenWrapper;
   }
 
   @Override
@@ -36,7 +37,7 @@ public class LogoutOperationProcessor extends BaseOperationProcessor implements 
             Try.of(() -> {
                   log.info("Start logout input: {}", validInput);
 
-                  InvalidatedJwt invalidatedJwt = createInvalidatedJwt();
+                  InvalidatedJwt invalidatedJwt = createInvalidatedJwt(validInput.getTokenInput());
                   invalidatedJwtRepository.save(invalidatedJwt);
 
                   LogoutOutput output = createOutput();
@@ -50,10 +51,10 @@ public class LogoutOperationProcessor extends BaseOperationProcessor implements 
         );
   }
 
-  private InvalidatedJwt createInvalidatedJwt() {
+  private InvalidatedJwt createInvalidatedJwt(TokenInput tokenInput) {
     return InvalidatedJwt.builder()
-        .token(tokenWrapper.getToken())
-        .expiryTime(tokenWrapper.getExpirationTime())
+        .token(tokenInput.getToken())
+        .expiryTime(tokenInput.getExpirationTime())
         .build();
   }
 
