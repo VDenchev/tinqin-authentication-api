@@ -1,6 +1,8 @@
 package com.tinqinacademy.authentication.api.operations.promote.input;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tinqinacademy.authentication.api.base.OperationInput;
+import com.tinqinacademy.authentication.api.models.TokenInput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,4 +21,7 @@ public class PromoteInput implements OperationInput {
 
   @UUID(message = "User id must be a valid UUID string")
   private String userId;
+
+  @JsonIgnore
+  private TokenInput tokenInput;
 }
