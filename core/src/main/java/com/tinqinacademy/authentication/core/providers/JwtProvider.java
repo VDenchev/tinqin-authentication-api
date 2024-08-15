@@ -3,6 +3,7 @@ package com.tinqinacademy.authentication.core.providers;
 import com.tinqinacademy.authentication.api.enums.RoleEnum;
 import com.tinqinacademy.authentication.api.exceptions.JwtException;
 import com.tinqinacademy.authentication.api.services.base.TokenProvider;
+import com.tinqinacademy.authentication.persistence.mongorepositories.InvalidatedJwtRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,9 +11,11 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -22,18 +25,22 @@ import java.util.List;
 
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.EMPTY_JWT_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.INVALID_JWT_MESSAGE;
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.INVALID_SIGNATURE_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.JWT_EXPIRED_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.PARSING_JWT_MESSAGE;
 import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.UNSUPPORTED_JWT_MESSAGE;
 
 @Slf4j
-@Service
+@Component
+@RequiredArgsConstructor
 public class JwtProvider implements TokenProvider {
 
   @Value("${security.jwt.secret-key}")
   private String secretKey;
   @Value("${security.jwt.duration-time}")
   private Long durationTime;
+
+  private final InvalidatedJwtRepository invalidatedJwtRepository;
 
   public String createToken(String username, List<RoleEnum> roles) {
     Instant issuedAt = Instant.now();
@@ -53,7 +60,7 @@ public class JwtProvider implements TokenProvider {
   }
 
   public Instant getExpirationTimeFromToken(String token) {
-    return extractClaims(token).get("exp", Date.class).toInstant();
+    return extractClaims(token).getExpiration().toInstant();
   }
 
   public List<RoleEnum> getRolesFromToken(String token) {
@@ -63,7 +70,17 @@ public class JwtProvider implements TokenProvider {
         .toList();
   }
 
-  private Claims extractClaims(String token) {
+  @Override
+  public void validate(String token) throws JwtException {
+    extractClaims(token);
+
+    boolean isTokenInvalidated = invalidatedJwtRepository.existsByToken(token);
+    if (isTokenInvalidated) {
+      throw new JwtException(JWT_EXPIRED_MESSAGE);
+    }
+  }
+
+  private Claims extractClaims(String token) throws JwtException {
     try {
       return Jwts.parser()
           .verifyWith(getKey())
@@ -76,10 +93,14 @@ public class JwtProvider implements TokenProvider {
       throw new JwtException(INVALID_JWT_MESSAGE);
     } catch (UnsupportedJwtException e) {
       throw new JwtException(UNSUPPORTED_JWT_MESSAGE);
+    } catch (SignatureException e) {
+      throw new JwtException(INVALID_SIGNATURE_MESSAGE);
     } catch (io.jsonwebtoken.JwtException e) {
       throw new JwtException(PARSING_JWT_MESSAGE);
     } catch (IllegalArgumentException e) {
       throw new JwtException(EMPTY_JWT_MESSAGE);
+    } catch (Exception e) {
+      throw new JwtException(PARSING_JWT_MESSAGE);
     }
   }
 
