@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString
-public class TokenWrapper {
+public class TokenInput {
 
   private String token;
   private String username;
