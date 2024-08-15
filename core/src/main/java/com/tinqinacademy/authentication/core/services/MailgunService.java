@@ -3,6 +3,7 @@ package com.tinqinacademy.authentication.core.services;
 import com.mailgun.api.v3.MailgunMessagesApi;
 import com.mailgun.model.message.Message;
 import com.mailgun.model.message.MessageResponse;
+import com.tinqinacademy.authentication.api.services.base.MailService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -10,17 +11,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 @RequiredArgsConstructor
 @Slf4j
-public class MailService {
+public class MailgunService implements MailService {
 
   public static final String SENDER_NAME = "hotel@tinqinacademy.com";
 
@@ -30,6 +31,8 @@ public class MailService {
   @Value("${mailgun.domain}")
   private String DOMAIN;
 
+  @Async
+  @Override
   public void sendConfirmationEmail(String recipient, String verificationCode) {
     Map<String, Object> model = new HashMap<>();
     model.put("verificationCode", verificationCode);
@@ -52,6 +55,7 @@ public class MailService {
   }
 
   @Async
+  @Override
   public void sendPasswordRecoveryEmail(String recipient, String recoveryCode) {
 
     Map<String, Object> model = new HashMap<>();
@@ -74,7 +78,7 @@ public class MailService {
     }
   }
 
-  public String getHtmlFromTemplate(String templateName, Map<String, Object> model) throws IOException, TemplateException {
+  private String getHtmlFromTemplate(String templateName, Map<String, Object> model) throws IOException, TemplateException {
     Template template = freeMarkerConfig.getTemplate(templateName);
     try (StringWriter stringWriter = new StringWriter()) {
       template.process(model, stringWriter);
