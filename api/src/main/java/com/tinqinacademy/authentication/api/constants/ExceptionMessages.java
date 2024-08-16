@@ -22,4 +22,5 @@ public class ExceptionMessages {
   public static final String PARSING_JWT_MESSAGE = "Error parsing JWT";
   public static final String EMPTY_JWT_MESSAGE = "JWT cannot be empty or null";
   public static final String NO_PERMISSIONS_MESSAGE = "Only admins can access this resource";
+  public static final String TOO_MANY_REQUESTS_MESSAGE = "You have exhausted your API Request Quota";
 }
