@@ -19,13 +19,14 @@
     <dependencies>
         <dependency>
             <groupId>com.tinqinacademy.authentication</groupId>
-            <artifactId>api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tinqinacademy.authentication</groupId>
             <artifactId>core</artifactId>
             <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>${bucket4j.version}</version>
         </dependency>
     </dependencies>
 
