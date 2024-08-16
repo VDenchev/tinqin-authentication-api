@@ -2,20 +2,16 @@ package com.tinqinacademy.authentication.rest.interceptors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tinqinacademy.authentication.api.enums.RoleEnum;
-import com.tinqinacademy.authentication.api.errors.Error;
-import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.exceptions.JwtException;
 import com.tinqinacademy.authentication.core.providers.JwtProvider;
 import com.tinqinacademy.authentication.rest.context.TokenContext;
+import com.tinqinacademy.authentication.rest.interceptors.base.BaseInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -23,15 +19,22 @@ import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.E
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
-public class TokenInterceptor implements HandlerInterceptor {
+public class TokenInterceptor extends BaseInterceptor implements HandlerInterceptor {
 
   public static final String AUTH_HEADER = "Authorization";
   public static final String BEARER_PREFIX = "Bearer ";
 
   private final TokenContext tokenContext;
   private final JwtProvider jwtProvider;
-  private final ObjectMapper objectMapper;
+
+  public TokenInterceptor(
+      ObjectMapper objectMapper, TokenContext tokenContext,
+      JwtProvider jwtProvider
+  ) {
+    super(objectMapper);
+    this.tokenContext = tokenContext;
+    this.jwtProvider = jwtProvider;
+  }
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -54,30 +57,8 @@ public class TokenInterceptor implements HandlerInterceptor {
     return true;
   }
 
-  private void buildErrorResponse(HttpServletResponse response, int status, String message) {
-    ErrorOutput errorOutput = convertToErrorOutput(status, message);
-
-    response.resetBuffer();
-    response.setStatus(status);
-    response.setHeader("Content-Type", "application/json");
-    try {
-      response.getOutputStream().print(objectMapper.writeValueAsString(errorOutput));
-      response.flushBuffer();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private ErrorOutput convertToErrorOutput(int status, String message) {
-    HttpStatusCode statusCode = HttpStatusCode.valueOf(status);
-    Error error = Error.builder()
-        .message(message)
-        .build();
-
-    return ErrorOutput.builder()
-        .errors(List.of(error))
-        .statusCode(statusCode)
-        .build();
+  private String extractToken(String authHeaderValue) {
+    return authHeaderValue.substring(BEARER_PREFIX.length());
   }
 
   private void populateTokenContext(String token) {
@@ -96,7 +77,4 @@ public class TokenInterceptor implements HandlerInterceptor {
     log.info("Populated token wrapper: {}", tokenContext);
   }
 
-  private String extractToken(String authHeaderValue) {
-    return authHeaderValue.substring(BEARER_PREFIX.length());
-  }
 }
