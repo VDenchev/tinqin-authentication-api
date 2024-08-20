@@ -10,7 +10,7 @@ import static com.tinqinacademy.authentication.api.apiroutes.FeignClientApiRoute
 @Headers({"Content-Type: application/json"})
 public interface AuthClient {
 
-  @Headers("Authorization: {authHeader}")
+  @Headers("Authorization:Bearer {authHeader}")
   @RequestLine(VALIDATE_TOKEN)
-  ValidateTokenOutput validateToken(@Param("auth_header") String authHeader);
+  ValidateTokenOutput validateToken(@Param("authHeader") String authHeader);
 }
