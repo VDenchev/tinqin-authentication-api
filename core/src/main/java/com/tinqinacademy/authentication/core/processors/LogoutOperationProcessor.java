@@ -13,6 +13,7 @@ import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static io.vavr.API.Match;
 
@@ -31,6 +32,7 @@ public class LogoutOperationProcessor extends BaseOperationProcessor implements 
   }
 
   @Override
+  @Transactional
   public Either<? extends ErrorOutput, LogoutOutput> process(LogoutInput input) {
     return validateInput(input)
         .flatMap(validInput ->

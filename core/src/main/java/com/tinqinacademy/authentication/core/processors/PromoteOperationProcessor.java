@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,7 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
   }
 
   @Override
+  @Transactional
   public Either<? extends ErrorOutput, PromoteOutput> process(PromoteInput input) {
     return validateInput(input)
         .flatMap(validInput ->
