@@ -1,6 +1,7 @@
 package com.tinqinacademy.authentication.api.errors;
 
 import com.tinqinacademy.authentication.api.base.OperationOutput;
+import com.tinqinacademy.authentication.api.base.Output;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString
-public class ErrorOutput implements OperationOutput {
+public class ErrorOutput implements Output {
 
   private List<? extends Error> errors;
   private HttpStatusCode statusCode;

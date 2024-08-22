@@ -1,6 +1,6 @@
 package com.tinqinacademy.authentication.rest.controllers;
 
-import com.tinqinacademy.authentication.api.base.OperationOutput;
+import com.tinqinacademy.authentication.api.base.Output;
 import com.tinqinacademy.authentication.api.enums.RoleEnum;
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.models.TokenInput;
@@ -31,9 +31,6 @@ import com.tinqinacademy.authentication.api.operations.recoverpassword.output.Re
 import com.tinqinacademy.authentication.api.operations.register.input.RegisterInput;
 import com.tinqinacademy.authentication.api.operations.register.operation.RegisterOperation;
 import com.tinqinacademy.authentication.api.operations.register.output.RegisterOutput;
-import com.tinqinacademy.authentication.api.operations.validatetoken.input.ValidateTokenInput;
-import com.tinqinacademy.authentication.api.operations.validatetoken.operation.ValidateTokenOperation;
-import com.tinqinacademy.authentication.api.operations.validatetoken.output.ValidateTokenOutput;
 import com.tinqinacademy.authentication.rest.base.BaseController;
 import com.tinqinacademy.authentication.rest.context.TokenContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +43,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -60,7 +56,6 @@ import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.LOGOU
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.PROMOTE;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.RECOVER_PASSWORD;
 import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.REGISTER;
-import static com.tinqinacademy.authentication.api.apiroutes.RestApiRoutes.VALIDATE_TOKEN;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,7 +69,6 @@ public class AuthenticationController extends BaseController {
   private final ChangePasswordOperation changePasswordOperation;
   private final PromoteOperation promoteOperation;
   private final DemoteOperation demoteOperation;
-  private final ValidateTokenOperation validateTokenOperation;
   private final LogoutOperation logoutOperation;
   private final TokenContext tokenContext;
 
@@ -88,7 +82,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Validation error", responseCode = "422")
   })
   @PostMapping(LOGIN)
-  public ResponseEntity<OperationOutput> login(@RequestBody LoginInput input) {
+  public ResponseEntity<Output> login(@RequestBody LoginInput input) {
     Either<? extends ErrorOutput, LoginOutput> output = loginOperation.process(input);
     return createResponseWithAuthHeader(output, HttpStatus.OK);
   }
@@ -104,33 +98,12 @@ public class AuthenticationController extends BaseController {
   })
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(LOGOUT)
-  public ResponseEntity<OperationOutput> logout() {
+  public ResponseEntity<Output> logout() {
     LogoutInput input = LogoutInput.builder()
         .tokenInput(buildTokenInput())
         .build();
 
     Either<? extends ErrorOutput, LogoutOutput> output = logoutOperation.process(input);
-    return createResponse(output, HttpStatus.OK);
-  }
-
-
-  @Operation(
-      summary = "Validates JWT",
-      description = "Returns user details if the token is valid"
-  )
-  @ApiResponses(value = {
-      @ApiResponse(description = "Returns user details", responseCode = "200"),
-      @ApiResponse(description = "Invalid token", responseCode = "400")
-  })
-  @SecurityRequirement(name = "bearerAuth")
-  @PostMapping(VALIDATE_TOKEN)
-  public ResponseEntity<OperationOutput> validateToken(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
-    String token = authHeader.replace("Bearer ", "");
-    ValidateTokenInput input = ValidateTokenInput.builder()
-        .token(token)
-        .build();
-
-    Either<? extends ErrorOutput, ValidateTokenOutput> output = validateTokenOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
 
@@ -144,7 +117,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Validation error", responseCode = "422")
   })
   @PostMapping(REGISTER)
-  public ResponseEntity<OperationOutput> register(@RequestBody RegisterInput input) {
+  public ResponseEntity<Output> register(@RequestBody RegisterInput input) {
     Either<? extends ErrorOutput, RegisterOutput> output = registerOperation.process(input);
     return createResponse(output, HttpStatus.CREATED);
   }
@@ -158,7 +131,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Sent recovery password if the email is registered", responseCode = "200"),
   })
   @PostMapping(RECOVER_PASSWORD)
-  public ResponseEntity<OperationOutput> recoverPassword(@RequestBody RecoverPasswordInput input) {
+  public ResponseEntity<Output> recoverPassword(@RequestBody RecoverPasswordInput input) {
     Either<? extends ErrorOutput, RecoverPasswordOutput> output = recoverPasswordOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
@@ -173,7 +146,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Invalid recovery code", responseCode = "400"),
   })
   @PostMapping(CHANGE_PASSWORD_USING_RECOVERY)
-  public ResponseEntity<OperationOutput> changePasswordUsingRecoveryCode(
+  public ResponseEntity<Output> changePasswordUsingRecoveryCode(
       @RequestBody ChangePasswordUsingRecoveryCodeInput input
   ) {
     Either<? extends ErrorOutput, ChangePasswordUsingRecoveryCodeOutput>
@@ -191,7 +164,7 @@ public class AuthenticationController extends BaseController {
       @ApiResponse(description = "Invalid code", responseCode = "400"),
   })
   @PostMapping(CONFIRM_REGISTRATION)
-  public ResponseEntity<OperationOutput> confirmRegistration(@RequestBody ConfirmRegistrationInput input) {
+  public ResponseEntity<Output> confirmRegistration(@RequestBody ConfirmRegistrationInput input) {
     Either<? extends ErrorOutput, ConfirmRegistrationOutput> output = confirmRegistrationOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
@@ -209,7 +182,7 @@ public class AuthenticationController extends BaseController {
   })
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(CHANGE_PASSWORD)
-  public ResponseEntity<OperationOutput> changePassword(@RequestBody ChangePasswordInput input) {
+  public ResponseEntity<Output> changePassword(@RequestBody ChangePasswordInput input) {
     Either<? extends ErrorOutput, ChangePasswordOutput> output = changePasswordOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
@@ -229,7 +202,7 @@ public class AuthenticationController extends BaseController {
   })
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(PROMOTE)
-  public ResponseEntity<OperationOutput> promote(@RequestBody PromoteInput input) {
+  public ResponseEntity<Output> promote(@RequestBody PromoteInput input) {
     input.setTokenInput(buildTokenInput());
 
     Either<? extends ErrorOutput, PromoteOutput> output = promoteOperation.process(input);
@@ -251,7 +224,7 @@ public class AuthenticationController extends BaseController {
   })
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(DEMOTE)
-  public ResponseEntity<OperationOutput> demote(@RequestBody DemoteInput input) {
+  public ResponseEntity<Output> demote(@RequestBody DemoteInput input) {
     input.setTokenInput(buildTokenInput());
 
     Either<? extends ErrorOutput, DemoteOutput> output = demoteOperation.process(input);
