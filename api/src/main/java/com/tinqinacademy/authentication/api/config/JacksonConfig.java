@@ -23,7 +23,6 @@ public class JacksonConfig {
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
     return mapper;
   }

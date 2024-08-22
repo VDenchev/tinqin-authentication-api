@@ -1,5 +1,6 @@
 package com.tinqinacademy.authentication.core.services;
 
+import com.tinqinacademy.authentication.api.models.CustomUserDetails;
 import com.tinqinacademy.authentication.persistence.entities.User;
 import com.tinqinacademy.authentication.persistence.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.tinqinacademy.authentication.api.constants.ExceptionMessages.USERNAME_NOT_FOUND_MESSAGE;
+
 @Component
 @RequiredArgsConstructor
 public class ApplicationUserDetailsService implements UserDetailsService {
@@ -22,14 +25,21 @@ public class ApplicationUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByUsernameIgnoreCase(username)
-        .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        .orElseThrow(() -> new UsernameNotFoundException(USERNAME_NOT_FOUND_MESSAGE));
+
     Set<GrantedAuthority> authorities = user.getRoles().stream()
         .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getType().name()))
         .collect(Collectors.toSet());
-    return org.springframework.security.core.userdetails.User.builder()
+
+    return CustomUserDetails.builder()
+        .userId(user.getId())
         .username(user.getUsername())
         .password(user.getPassword())
         .authorities(authorities)
+        .accountNonExpired(true)
+        .accountNonLocked(true)
+        .enabled(true)
+        .credentialsNonExpired(true)
         .build();
   }
 }
