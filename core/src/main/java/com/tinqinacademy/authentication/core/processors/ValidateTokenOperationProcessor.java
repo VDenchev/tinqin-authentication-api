@@ -2,6 +2,7 @@ package com.tinqinacademy.authentication.core.processors;
 
 import com.tinqinacademy.authentication.api.errors.ErrorOutput;
 import com.tinqinacademy.authentication.api.exceptions.JwtException;
+import com.tinqinacademy.authentication.api.models.CustomUserDetails;
 import com.tinqinacademy.authentication.api.operations.validatetoken.input.ValidateTokenInput;
 import com.tinqinacademy.authentication.api.operations.validatetoken.operation.ValidateTokenOperation;
 import com.tinqinacademy.authentication.api.operations.validatetoken.output.ValidateTokenOutput;
@@ -13,7 +14,6 @@ import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -51,7 +51,7 @@ public class ValidateTokenOperationProcessor extends BaseOperationProcessor impl
 
                   String username = jwtProvider.getUsernameFromToken(validInput.getToken());
 
-                  User userDetails = (User) userDetailsService.loadUserByUsername(username);
+                  CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
 
                   ValidateTokenOutput output = createOutput(userDetails);
                   log.info("End validate token output: {}", output);
@@ -73,7 +73,7 @@ public class ValidateTokenOperationProcessor extends BaseOperationProcessor impl
     }
   }
 
-  private ValidateTokenOutput createOutput(User userDetails) {
+  private ValidateTokenOutput createOutput(CustomUserDetails userDetails) {
     return ValidateTokenOutput.builder()
         .user(userDetails)
         .build();

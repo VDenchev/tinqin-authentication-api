@@ -1,4 +1,4 @@
 package com.tinqinacademy.authentication.api.base;
 
-public interface OperationOutput extends Output {
+public interface Output {
 }

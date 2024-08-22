@@ -1,7 +1,6 @@
-package com.tinqinacademy.authentication.api.operations.validatetoken.output;
+package com.tinqinacademy.authentication.api.operations.getuserbyphoneno.output;
 
 import com.tinqinacademy.authentication.api.base.OperationOutput;
-import com.tinqinacademy.authentication.api.models.CustomUserDetails;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,13 +8,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @ToString
-public class ValidateTokenOutput implements OperationOutput {
+public class SearchUsersOutput implements OperationOutput {
 
-  private CustomUserDetails user;
+  private List<String> userIds;
 }

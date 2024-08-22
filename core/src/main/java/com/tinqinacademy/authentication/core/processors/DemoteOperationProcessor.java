@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ public class DemoteOperationProcessor extends BaseOperationProcessor implements 
   }
 
   @Override
+  @Transactional
   public Either<? extends ErrorOutput, DemoteOutput> process(DemoteInput input) {
     return validateInput(input)
         .flatMap(validInput ->
