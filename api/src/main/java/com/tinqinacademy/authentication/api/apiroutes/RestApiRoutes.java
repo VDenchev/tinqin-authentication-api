@@ -15,4 +15,5 @@ public class RestApiRoutes {
   public static final String DEMOTE = AUTH + "/demote";
   public static final String VALIDATE_TOKEN = AUTH + "/validate-token";
   public static final String LOGOUT = AUTH + "/logout";
+  public static final String SEARCH_USERS = AUTH + "/users";
 }
