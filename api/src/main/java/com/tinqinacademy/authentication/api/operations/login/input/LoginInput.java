@@ -18,11 +18,11 @@ import lombok.ToString;
 @ToString
 public class LoginInput implements OperationInput {
 
-  @NotBlank(message = "Username must not be blank")
+  @NotBlank(message = "Username cannot be blank")
   @Schema(example = "ivan120")
   private String username;
 
-  @NotBlank(message = "Password must not be blank")
+  @NotBlank(message = "Password cannot be blank")
   @Schema(example = "ivan123456")
   private String password;
 }

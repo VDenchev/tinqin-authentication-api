@@ -59,9 +59,9 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
             Try.of(() -> {
                   log.info("Start register input: {}", validInput);
 
-                  checkDuplicateUsername(validInput);
-                  checkDuplicateEmail(validInput);
-                  checkDuplicatePhoneNo(validInput);
+                  checkUsernameTaken(validInput);
+                  checkEmailTaken(validInput);
+                  checkPhoneNoTaken(validInput);
 
                   String securePasswordHash = passwordEncoder.encode(validInput.getPassword());
                   log.info("Generated secure password hash: {}", securePasswordHash);
@@ -84,7 +84,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
         );
   }
 
-  private void checkDuplicateUsername(RegisterInput input) {
+  private void checkUsernameTaken(RegisterInput input) {
     String username = input.getUsername();
 
     boolean idDuplicateUsername = userRepository.existsByUsernameIgnoreCase(username);
@@ -93,7 +93,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     }
   }
 
-  private void checkDuplicateEmail(RegisterInput input) {
+  private void checkEmailTaken(RegisterInput input) {
     String email = input.getEmail();
 
     boolean idDuplicateEmail = userRepository.existsByEmailIgnoreCase(email);
@@ -102,7 +102,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     }
   }
 
-  private void checkDuplicatePhoneNo(RegisterInput input) {
+  private void checkPhoneNoTaken(RegisterInput input) {
     String phoneNo = input.getPhoneNo();
 
     boolean idDuplicatePhoneNo = userRepository.existsByPhoneNumber(phoneNo);

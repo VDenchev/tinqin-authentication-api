@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -30,7 +32,7 @@ import static io.vavr.API.Match;
 @Slf4j
 public class RecoverPasswordOperationProcessor extends BaseOperationProcessor implements RecoverPasswordOperation {
 
-  public static final int OTP_LENGTH = 32;
+  public static final int RECOVERY_CODE_SIZE = 32;
 
   private final RecoveryCodeRepository recoveryCodeRepository;
   private final UserRepository userRepository;
@@ -65,11 +67,15 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
                   User user = userMaybe.get();
                   recoveryCodeRepository.deleteAllByUserId(user.getId());
 
-                  String otp = generateRandomOtp(OTP_LENGTH);
-                  String hashedOtp = passwordEncoder.encode(otp);
-                  mailService.sendPasswordRecoveryEmail(user.getEmail(), otp);
+                  String recoveryCode = generateRandomOtp(RECOVERY_CODE_SIZE);
+                  Map<String, Object> model = new HashMap<>();
+                  model.put("recoveryCode", recoveryCode);
 
-                  RecoveryCode code = getRecoveryCode(user, hashedOtp);
+                  mailService.sendEmail("Recover your password", user.getEmail(), model,
+                      "password-recovery-template.ftl");
+
+                  String hashedRecoveryCode = passwordEncoder.encode(recoveryCode);
+                  RecoveryCode code = convertToRecoveryCode(user, hashedRecoveryCode);
                   recoveryCodeRepository.save(code);
 
                   return createOutput();
@@ -81,7 +87,7 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
         );
   }
 
-  private static RecoveryCode getRecoveryCode(User user, String otp) {
+  private RecoveryCode convertToRecoveryCode(User user, String otp) {
     return RecoveryCode.builder()
         .userId(user.getId())
         .createdAt(Instant.now())
@@ -89,11 +95,11 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
         .build();
   }
 
-  private static RecoverPasswordOutput createOutput() {
+  private RecoverPasswordOutput createOutput() {
     return RecoverPasswordOutput.builder().build();
   }
 
-  private String generateRandomOtp(int length) {
+  private static String generateRandomOtp(int length) {
     String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*=+?";
 
     SecureRandom random = new SecureRandom();
