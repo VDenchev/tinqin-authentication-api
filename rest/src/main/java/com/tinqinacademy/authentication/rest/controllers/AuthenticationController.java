@@ -138,12 +138,13 @@ public class AuthenticationController extends BaseController {
 
 
   @Operation(
-      summary = "Chane password via a recovery code",
+      summary = "Change password via a recovery code",
       description = "Changes the user password using a recovery code"
   )
   @ApiResponses(value = {
       @ApiResponse(description = "Changed password", responseCode = "200"),
       @ApiResponse(description = "Invalid recovery code", responseCode = "400"),
+      @ApiResponse(description = "Validation error", responseCode = "422"),
   })
   @PostMapping(CHANGE_PASSWORD_USING_RECOVERY)
   public ResponseEntity<Output> changePasswordUsingRecoveryCode(
@@ -162,6 +163,7 @@ public class AuthenticationController extends BaseController {
   @ApiResponses(value = {
       @ApiResponse(description = "Activated user account", responseCode = "200"),
       @ApiResponse(description = "Invalid code", responseCode = "400"),
+      @ApiResponse(description = "Validation error", responseCode = "422"),
   })
   @PostMapping(CONFIRM_REGISTRATION)
   public ResponseEntity<Output> confirmRegistration(@RequestBody ConfirmRegistrationInput input) {
@@ -183,6 +185,9 @@ public class AuthenticationController extends BaseController {
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping(CHANGE_PASSWORD)
   public ResponseEntity<Output> changePassword(@RequestBody ChangePasswordInput input) {
+    TokenInput tokenInput = buildTokenInput();
+    input.setTokenInput(tokenInput);
+
     Either<? extends ErrorOutput, ChangePasswordOutput> output = changePasswordOperation.process(input);
     return createResponse(output, HttpStatus.OK);
   }
