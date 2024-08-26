@@ -33,46 +33,19 @@ public class MailgunService implements MailService {
 
   @Async
   @Override
-  public void sendConfirmationEmail(String recipient, String verificationCode) {
-    Map<String, Object> model = new HashMap<>();
-    model.put("verificationCode", verificationCode);
-
+  public void sendEmail(String subject, String recipient, Map<String, Object> model, String template) {
     try {
-      String emailTemplateString = getHtmlFromTemplate("email-verification-template.ftl", model);
+      String emailTemplateString = getHtmlFromTemplate(template, model);
+      log.info("Sending email from " + SENDER_NAME);
 
       Message message = Message.builder()
           .from(SENDER_NAME)
           .to(recipient)
-          .subject("Verify account")
+          .subject(subject)
           .html(emailTemplateString)
           .build();
 
-
-      MessageResponse messageResponse = mailgunMessagesApi.sendMessage(DOMAIN, message);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Async
-  @Override
-  public void sendPasswordRecoveryEmail(String recipient, String recoveryCode) {
-
-    Map<String, Object> model = new HashMap<>();
-    model.put("recoveryCode", recoveryCode);
-
-    try {
-      String emailTemplateString = getHtmlFromTemplate("password-recovery-template.ftl", model);
-
-      Message message = Message.builder()
-          .from(SENDER_NAME)
-          .to(recipient)
-          .subject("Recover password")
-          .html(emailTemplateString)
-          .build();
-
-
-      MessageResponse messageResponse = mailgunMessagesApi.sendMessage(DOMAIN, message);
+      mailgunMessagesApi.sendMessage(DOMAIN, message);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +26,8 @@ public class EmailConfirmationService {
   public void sendConfirmationEmail(User user) {
 
     String code = generateCode();
-    mailService.sendConfirmationEmail(user.getEmail(), code);
+    Map<String, Object> model = new HashMap<>();
+    model.put("verificationCode", code);
 
     VerificationCode verificationCode = VerificationCode.builder()
         .code(code)
@@ -33,6 +36,9 @@ public class EmailConfirmationService {
         .build();
 
     verificationCodeRepository.save(verificationCode);
+
+    mailService.sendEmail("Confirm your email", user.getEmail(), model,
+        "email-verification-template.ftl");
   }
 
   private String generateCode() {

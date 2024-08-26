@@ -1,7 +1,8 @@
 package com.tinqinacademy.authentication.api.services.base;
 
+import java.util.Map;
+
 public interface MailService {
 
-  void sendConfirmationEmail(String recipient, String verificationCode);
-  void sendPasswordRecoveryEmail(String recipient, String recoveryCode);
+  void sendEmail(String subject, String recipient, Map<String, Object> model, String template);
 }
