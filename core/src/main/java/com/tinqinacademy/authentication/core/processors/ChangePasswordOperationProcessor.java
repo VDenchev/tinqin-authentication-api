@@ -41,8 +41,10 @@ public class ChangePasswordOperationProcessor extends BaseOperationProcessor imp
             Try.of(() -> {
                   log.info("Start change password input: {}", validInput);
 
-                  User user = userRepository.findByEmailIgnoreCase(validInput.getEmail())
+                  User user = userRepository.findByUsernameIgnoreCase(validInput.getTokenInput().getUsername())
                       .orElseThrow(() -> new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE));
+
+                  ensureEmailsMatch(validInput, user);
 
                   ensurePasswordsMatch(input, user);
 
@@ -60,7 +62,13 @@ public class ChangePasswordOperationProcessor extends BaseOperationProcessor imp
         );
   }
 
-  private static ChangePasswordOutput createOutput() {
+  private void ensureEmailsMatch(ChangePasswordInput validInput, User user) {
+    if (!user.getEmail().equalsIgnoreCase(validInput.getEmail())) {
+      throw new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE);
+    }
+  }
+
+  private ChangePasswordOutput createOutput() {
     return ChangePasswordOutput.builder().build();
   }
 
